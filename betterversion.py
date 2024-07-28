@@ -21,7 +21,8 @@ class Ship:
         self.coordinates = []
 
     def place_ships(self):
-        # self.single_ship(4)
+        self.single_ship(4)
+        self.double_ship(2)
         self.triple_ship()
 
     # проверка соседства - возвращает True если соседи
@@ -42,21 +43,22 @@ class Ship:
             except ValueError:
                 print('Некорректный ввод. Попробуйте снова')
 
+
     # катер
-    # def single_ship(self, count):
-    #     for _ in range(count):
-    #         while True:
-    #             x, y = self.get_coordinates('катера')
-    #             if grid[x][y] == '◯':
-    #                 if not any(self.are_neighbours((x, y), old_coordinates) for old_coordinates in self.coordinates):
-    #                     grid[x][y] = '■'
-    #                     self.coordinates.append((x, y))
-    #                     print_field()
-    #                     break
-    #                 else:
-    #                     print('Соседняя ячейка! Попробуйте снова.')
-    #             else:
-    #                 print('Позиция занята. Попробуйте снова.')
+    def single_ship(self, count):
+        for _ in range(count):
+            while True:
+                x, y = self.get_coordinates('катера')
+                if grid[x][y] == '◯':
+                    if not any(self.are_neighbours((x, y), old_coordinates) for old_coordinates in self.coordinates):
+                        grid[x][y] = '■'
+                        self.coordinates.append((x, y))
+                        print_field()
+                        break
+                    else:
+                        print('Соседняя ячейка! Попробуйте снова.')
+                else:
+                    print('Позиция занята. Попробуйте снова.')
 
     # крейсер
     def triple_ship(self):
@@ -71,11 +73,15 @@ class Ship:
                 shift = -1 if direction == 'left' else 1
                 if all(1 <= y + shift * i <= 6 for i in range(3)):
                     if all(grid[x][y + shift * i] == '◯' for i in range(3)):
-                        for i in range(3):
-                            grid[x][y + shift * i] = '■'
-                            self.coordinates.append((x, y + shift * i))
-                        print_field()
-                        break
+                        if not any(self.are_neighbours((x, y + shift * i), old_coord) for i in range(3) for old_coord in
+                                   self.coordinates):
+                            for i in range(3):
+                                grid[x][y + shift * i] = '■'
+                                self.coordinates.append((x, y + shift * i))
+                            print_field()
+                            break
+                        else:
+                            print('Соседняя ячейка! Попробуйте снова.')
                     else:
                         print('Позиция занята. Попробуйте снова')
                 else:
@@ -85,15 +91,66 @@ class Ship:
                 shift = -1 if direction == 'up' else 1
                 if all(1 <= x + shift * i <= 6 for i in range(3)):
                     if all(grid[x + shift * i][y] == '◯' for i in range(3)):
-                        for i in range(3):
-                            grid[x + shift * i][y] = '■'
-                            self.coordinates.append((x + shift * i, y))
-                        print_field()
-                        break
+                        if not any(self.are_neighbours((x + shift * i, y), old_coord) for i in range(3) for old_coord in
+                                   self.coordinates):
+                            for i in range(3):
+                                grid[x + shift * i][y] = '■'
+                                self.coordinates.append((x + shift * i, y))
+                            print_field()
+                            break
+                        else:
+                            print('Соседняя ячейка! Попробуйте снова.')
                     else:
                         print('Позиция занята. Попробуйте снова')
                 else:
                     print('Крейсер вышел за границы поля!')
+
+    def double_ship(self, count):
+        for _ in range(count):
+            while True:
+                x, y = self.get_coordinates('эсминца')
+                direction = input('Выберите направление (left/right/up/down): ')
+                if direction not in ['left', 'right', 'up', 'down']:
+                    print('Некорректный ввод. Попробуйте снова.')
+                    continue
+
+                if direction in ['left', 'right']:
+                    shift = -1 if direction == 'left' else 1
+                    if all(1 <= y + shift * i <= 6 for i in range(2)):
+                        if all(grid[x][y + shift * i] == '◯' for i in range(2)):
+                            if not any(
+                                    self.are_neighbours((x, y + shift * i), old_coord) for i in range(2) for old_coord
+                                    in self.coordinates):
+                                for i in range(2):
+                                    grid[x][y + shift * i] = '■'
+                                    self.coordinates.append((x, y + shift * i))
+                                print_field()
+                                break
+                            else:
+                                print('Соседний корабль! Попробуйте снова.')
+                        else:
+                            print('Позиция занята. Попробуйте снова.')
+                    else:
+                        print('Эсминец вышел за границы поля!')
+
+                elif direction in ['up', 'down']:
+                    shift = -1 if direction == 'up' else 1
+                    if all(1 <= x + shift * i <= 6 for i in range(2)):
+                        if all(grid[x + shift * i][y] == '◯' for i in range(2)):
+                            if not any(
+                                    self.are_neighbours((x + shift * i, y), old_coord) for i in range(2) for old_coord
+                                    in self.coordinates):
+                                for i in range(2):
+                                    grid[x + shift * i][y] = '■'
+                                    self.coordinates.append((x + shift * i, y))
+                                print_field()
+                                break
+                            else:
+                                print('Соседний корабль! Попробуйте снова.')
+                        else:
+                            print('Позиция занята. Попробуйте снова.')
+                    else:
+                        print('Эсминец вышел за границы поля!')
 
 
 game = Ship()
